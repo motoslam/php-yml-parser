@@ -24,9 +24,19 @@ class Parser
 
     public function parse($file)
     {
-        $this->path = [];
-
-        $this->xmlReader->open($file);
+        $this->path = [];    
+        try{
+            $this->xmlReader->open($file);
+        } catch (\Exception $e){
+            $ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36';
+            $curl_handle=curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL, $file);
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($curl_handle, CURLOPT_USERAGENT, $ua);
+            $query = curl_exec($curl_handle);
+            curl_close($curl_handle);
+            $this->xmlReader->XML($query);
+        }
         $result = $this->read();
         $this->xmlReader->close();
 
